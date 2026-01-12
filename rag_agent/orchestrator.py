@@ -130,22 +130,18 @@ class RAGOrchestrator(BaseAgent):
         # Routing Logic
         route_to_file_manager = False
 
-        # 1. If files were just uploaded, route to file manager
         if has_file_upload:
             logger.info(f"[{self.name}] → Routing to File Manager (file upload detected)")
             route_to_file_manager = True
 
-        # 2. If user explicitly asks about files/uploads/indexing
-        elif any(keyword in user_text for keyword in ["upload", "index", "file", "list files", "what files"]):
+        elif any(keyword in user_text for keyword in ["upload", "index", "arquivo", "liste os arquivos", "quais arquivos"]):
             logger.info(f"[{self.name}] → Routing to File Manager (file-related query)")
             route_to_file_manager = True
 
-        # 3. Otherwise, route to search assistant
         else:
             logger.info(f"[{self.name}] → Routing to Search Assistant (search/question query)")
             route_to_file_manager = False
 
-        # Execute the appropriate agent
         if route_to_file_manager:
             logger.info(f"[{self.name}] Running File Manager Agent...")
             async for event in self.file_manager.run_async(ctx):
@@ -159,55 +155,4 @@ class RAGOrchestrator(BaseAgent):
 
         logger.info(f"[{self.name}] Orchestration complete")
 
-    @override
-    async def _run_live_impl(
-            self, ctx: InvocationContext
-    ) -> AsyncGenerator[Event, None]:
-        """
-        Orchestration logic for live/voice mode.
 
-        In voice mode, we typically route to SearchAssistant since:
-        - File uploads happen in text mode (via UI button)
-        - Voice is for natural conversation and asking questions
-        """
-        logger.info(f"[{self.name}] Starting LIVE orchestration (voice mode)")
-
-        # Check session state
-        state = ctx.session.state
-        logger.info(f"[{self.name}] Session state: {state}")
-
-        # In live mode, check if we need to handle file management first
-        # by looking at recent uploads in session
-        route_to_file_manager = False
-
-        # Check if there are recently uploaded files that need indexing
-        if ctx.session.events and len(ctx.session.events) > 0:
-            # Check last few events for uploads
-            for event in reversed(ctx.session.events[-3:]):
-                if event.content and event.content.parts:
-                    for part in event.content.parts:
-                        if part.inline_data:
-                            logger.info(f"[{self.name}] Detected unprocessed upload in session")
-                            route_to_file_manager = True
-                            break
-                if route_to_file_manager:
-                    break
-
-        # Route appropriately
-        if route_to_file_manager:
-            logger.info(f"[{self.name}] → Routing to File Manager (unprocessed uploads)")
-            # Run FileManager in async mode (not live)
-            async for event in self.file_manager.run_async(ctx):
-                logger.info(f"[{self.name}] Event from FileManager: {event.author}")
-                yield event
-
-            # After handling uploads, continue to SearchAssistant for voice
-            logger.info(f"[{self.name}] Files processed, now starting voice conversation...")
-
-        # Main voice interaction goes to SearchAssistant
-        logger.info(f"[{self.name}] → Running Search Assistant in LIVE mode")
-        async for event in self.search_assistant.run_live(ctx):
-            logger.info(f"[{self.name}] Live event from SearchAssistant")
-            yield event
-
-        logger.info(f"[{self.name}] Live orchestration complete")

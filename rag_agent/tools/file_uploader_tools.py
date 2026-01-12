@@ -148,21 +148,21 @@ async def uploaded_file_list(tool_context: ToolContext) -> Dict[str, Any]:
 
 async def index_uploaded_file(filename: str, tool_context: ToolContext) -> Dict[str, Any]:
     """
-    Index a file that was uploaded via the ADK web UI.
+    Indexa um arquivo carregado através da interface web do ADK.
 
-    This tool takes a file uploaded through the web UI (stored as an artifact)
-    and indexes it into the file search store so it can be searched.
+    Esta ferramenta recebe um arquivo carregado pela interface web (armazenado como um artefato)
+    e o indexa no repositório de busca de arquivos para que possa ser pesquisado.
 
     Args:
-        filename: The name of the uploaded file (e.g., "document.pdf")
-        tool_context: The tool context (automatically provided by ADK)
+        filename: o nome do arquivo feito upload (e.g., "document.pdf")
+        tool_context: o contexto da ferramenta
 
     Returns:
-        A dictionary containing:
-        - status: "success" or "error"
-        - message: Description of what happened
-        - filename: The name of the indexed file
-        - store_name: The file search store name
+        Um dicionario contendo:
+        - status: "success" ou "error"
+        - message: Descrição do evento
+        - filename: o arquivo indexado
+        - store_name: O file search store
     """
 
     print(f"[FileUpload] ====== index_uploaded_file CALLED with filename='{filename}' ======")
@@ -278,7 +278,7 @@ async def index_uploaded_file(filename: str, tool_context: ToolContext) -> Dict[
         config['uploaded_files'].append(actual_filename)
         save_config(config)
 
-        # Store in session state
+        # armazenando o estado do contexto
         tool_context.state['last_indexed_file'] = actual_filename
         tool_context.state['indexed_files'] = config['uploaded_files']
 

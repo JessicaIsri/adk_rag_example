@@ -8,8 +8,7 @@ from rag_agent.tools import CONFIG_PATH, client, api_key
 
 
 def load_file_store_config() -> Dict[str, Any]:
-    """Load the file search store configuration"""
-
+    """Carrega as informações do storage"""
 
     if not CONFIG_PATH.exists():
         return {
@@ -22,9 +21,6 @@ def load_file_store_config() -> Dict[str, Any]:
 
 
 def search_documents(query: str, tool_context: ToolContext) -> Dict[str, Any]:
-
-
-    # Load configuration
     config = load_file_store_config()
 
     if config.get('error'):
@@ -75,7 +71,6 @@ def search_documents(query: str, tool_context: ToolContext) -> Dict[str, Any]:
             )
         )
 
-        # Extract grounding sources
         sources = []
         if response.candidates and response.candidates[0].grounding_metadata:
             grounding = response.candidates[0].grounding_metadata
@@ -87,7 +82,6 @@ def search_documents(query: str, tool_context: ToolContext) -> Dict[str, Any]:
 
         print(f"[FileSearch] Found {len(sources)} source(s)")
 
-        # Store in session state for debugging
         tool_context.state['last_search'] = {
             "query": query,
             "found_sources": len(sources),
@@ -115,5 +109,4 @@ def search_documents(query: str, tool_context: ToolContext) -> Dict[str, Any]:
         }
 
 
-# Create the FunctionTool for use in the agent
 search_tool = FunctionTool(search_documents)

@@ -1,9 +1,6 @@
 import os
 
 from google.adk.agents import LlmAgent
-from google.adk.agents.llm_agent import Agent
-from google.adk.cli.built_in_agents.adk_agent_builder_assistant import root_agent
-
 from rag_agent.orchestrator import RAGOrchestrator
 from rag_agent.tools.file_uploader_tools import list_files_tool, index_file_tool
 from rag_agent.tools.search_file import search_tool
