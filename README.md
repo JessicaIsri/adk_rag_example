@@ -74,7 +74,3 @@ rag_agent/
 ├── file_store_config.json     # Estado local dos arquivos indexados
 └── README.md
 ```
-
------
-
-Referencia: https://www.youtube.com/watch?v=h4tuLuzSjbA&t=412s
